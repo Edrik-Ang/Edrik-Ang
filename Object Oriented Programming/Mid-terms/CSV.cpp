@@ -1,11 +1,13 @@
 //Implementation of the CSV.cpp class
+//task: 
+//1. Readthe CSV file line by line
+//2. Tokenise each line based on the separator (,)
+//3. Store each WeatherDataEntry object in a vector for later use
 #include "CSV.h"
 #include <fstream>
 #include <iostream>
 
-CSV::CSV(){
-
-}
+CSV::CSV(){}
 
 std::vector<WeatherDataEntry> CSV::readLine(std::istream &filename) {
     std::vector<WeatherDataEntry> weatherDataEntries;
@@ -54,7 +56,6 @@ std::vector<WeatherDataEntry> CSV::readLine(std::istream &filename) {
 
         weatherDataEntries.push_back(entry);
     }
-    //Dont need read the first line as it is header
     return weatherDataEntries;
 }
 
@@ -67,11 +68,14 @@ std::vector<std::string> CSV::tokenise(const std::string& csvLine, char sep)
     start = csvLine.find_first_not_of(sep, 0);
     do{
         end = csvLine.find_first_of(sep, start);
-        if (start == csvLine.length() || start == end) break;
-        if (end >= 0) token = csvLine.substr(start, end - start);
-        else token = csvLine.substr(start, csvLine.length() - start);
+        if (start == csvLine.length() || start == end)
+            break;
+        if (end >= 0) 
+            token = csvLine.substr(start, end - start);
+        else 
+            token = csvLine.substr(start, csvLine.length() - start);
         tokens.push_back(token);
-    start = end + 1;
+        start = end + 1;
     }while(end > 0);
 
    return tokens; 
