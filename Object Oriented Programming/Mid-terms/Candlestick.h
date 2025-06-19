@@ -9,21 +9,22 @@ class Candlestick{
     public:
 
 
-
-        double open;
-        double close;
-        double high;
-        double low;
+        int time_key; //represent the x-axis value, which could be year
+        double open,close,high,low; //represent the y-axis values
 
     Candlestick(
+                int x,
                 double o,
                 double c,
                 double h, 
                 double l):
+                time_key(x),
                 open(o),
                 close(c),
                 high(h), 
                 low(l) {}
+
+
        
-                // void print() const; 
+    // void print() const; 
 };

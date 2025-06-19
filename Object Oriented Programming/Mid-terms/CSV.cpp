@@ -66,7 +66,8 @@ std::vector<std::string> CSV::tokenise(const std::string& csvLine, char sep)
    signed int start, end;
    std::string token;
     start = csvLine.find_first_not_of(sep, 0);
-    do{
+    do
+    {
         end = csvLine.find_first_of(sep, start);
         if (start == csvLine.length() || start == end)
             break;

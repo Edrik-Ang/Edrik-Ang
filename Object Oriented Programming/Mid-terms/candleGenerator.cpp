@@ -1,4 +1,5 @@
-//this will take vectors of candlesticks and print them out vertically column by column from left to right yearly.
+//Task 1:
+//this will create a candlestick and store them inside a vector candlestick object called candlesticks.
 //tasks include:
 //1. group the data yearly
 //2. Calculate the average, high, lows
@@ -90,22 +91,43 @@ std::vector<Candlestick> CandleGenerator::computeCandlesticks(const std::vector<
     std::string prevYear = "";
     double prevAvg = 0.0;
 
+    // Iterate through the yearly data to compute candlesticks
     for (const auto& [year, temps]: YearlyData){
         if (temps.empty()) continue; // Skip empty years
-        double sum = std::accumulate(temps.begin(), temps.end(), 0.0);
-        double avg = sum /temps.size();
-        double high = *std::max_element(temps.begin(), temps.end());
-        double low = *std::min_element(temps.begin(), temps.end());
+        double sum = std::accumulate(temps.begin(), temps.end(), 0.0); // add up all the temperatures for the year
+        double avg = sum /temps.size(); // Calculate the average temperature for the year
+        double high = *std::max_element(temps.begin(), temps.end()); // Find the highest temperature for the year
+        double low = *std::min_element(temps.begin(), temps.end()); // Find the lowest temperature for the year
 
-        double open = (prevYear =="") ? avg : prevAvg; // If the first year, set open to average of the current year
+        double open = (prevYear =="") ? avg : prevAvg; // If the first year empty, set open to average of the current year, else set it to the previous year's average
         double close = avg; // Close is the average of the current year
-        candlesticks.emplace_back(open, close, high, low);
+        candlesticks.emplace_back(std::stoi(year), open, close, high, low);
         prevYear = year; // Update previous year
         prevAvg = avg; // Update previous average
 
     }
     return candlesticks;
 }
+// Function to compute candlesticks for multiple countries from a vector of WeatherDataEntry objects
+std::map<std::string, std::vector<Candlestick>> CandleGenerator::computeCandlesticks(
+    const std::vector<WeatherDataEntry>& entries,
+    const std::vector<std::string>& countries)
+{
+    std::map<std::string, std::vector<Candlestick>> allCandlesticks;
 
+    for (const auto& country : countries) {
+        allCandlesticks[country] = computeCandlesticks(entries, country);
+    }
 
-//Need to 
+    return allCandlesticks;
+}
+void CandleGenerator::generateCandles(const std::vector<Candlestick>& candlesticks) {
+       for (const auto& candle : candlesticks) {
+                std::cout << "Year: " << candle.time_key
+                          << "Candlestick - Open: " << candle.open 
+                          << ", Close: " << candle.close 
+                          << ", High: " << candle.high 
+                          << ", Low: " << candle.low 
+                          << std::endl;
+            }
+}
