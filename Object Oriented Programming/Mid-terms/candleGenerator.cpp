@@ -13,7 +13,7 @@
 #include <numeric> // For std::accumulate
 #include <algorithm> // For std::max_element and std::min_element
 
-//Function to compute a candlestick for a country from a vector of WeatherDataEntry objects.
+//Function to compute a vector of candlesticks for a country from a vector of WeatherDataEntry objects.
 std::vector<Candlestick> CandleGenerator::computeCandlesticks(const std::vector<WeatherDataEntry>& entries, const std::string& country){
 
     std::map<std::string, std::vector<double>> YearlyData;
@@ -121,6 +121,11 @@ std::map<std::string, std::vector<Candlestick>> CandleGenerator::computeCandlest
 
     return allCandlesticks;
 }
+
+
+//function to generate candles from a vector of Candlestick objects
+//this function will print the candlestick data to the console
+//Purpose is to check if the candlestick data is working correctly
 void CandleGenerator::generateCandles(const std::vector<Candlestick>& candlesticks) {
        for (const auto& candle : candlesticks) {
                 std::cout << "Year: " << candle.time_key

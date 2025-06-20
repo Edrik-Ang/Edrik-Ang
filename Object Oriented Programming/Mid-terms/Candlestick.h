@@ -4,11 +4,8 @@
 #pragma once
 #include <string>
 
-
 class Candlestick{
     public:
-
-
         int time_key; //represent the x-axis value, which could be year
         double open,close,high,low; //represent the y-axis values
 
@@ -22,9 +19,5 @@ class Candlestick{
                 open(o),
                 close(c),
                 high(h), 
-                low(l) {}
-
-
-       
-    // void print() const; 
+                low(l) {} 
 };

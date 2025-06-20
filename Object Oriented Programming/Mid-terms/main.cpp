@@ -7,10 +7,15 @@
 #include "Candlestick.h"
 #include "candleGenerator.h"
 #include "Plot.h"
+#include "candlefilter.h"
 
 
 
-
+std::vector<std::string> countries = {
+            "AT", "BE", "BG", "CH", "CZ", "DE", "DK", "EE", "ES", "FI", "FR",
+            "GB", "GR", "HR", "HU", "IE", "IT", "LT", "LU", "LV", "NL", "NO",
+            "PL", "PT", "RO", "SE", "SI", "SK"
+};
 
 int main()
 {
@@ -27,6 +32,9 @@ int main()
 
     std::cout<< "Weather Data Entries Loaded: " << weatherDataEntries.size() << std::endl;
 
+    std::cout << "computing all candlesticks, this may take a while..." << std::endl;
+    std::map<std::string, std::vector<Candlestick>> allCandlesticks = CandleGenerator::computeCandlesticks(weatherDataEntries, countries);
+    std::cout << "All candlesticks computed successfully." << std::endl;
     auto exit = false;
     do 
     {
@@ -45,19 +53,15 @@ int main()
 
             int input;
             std::cin >>input;
-            std::vector<std::string> countries = {
-                        "AT", "BE", "BG", "CH", "CZ", "DE", "DK", "EE", "ES", "FI", "FR",
-                        "GB", "GR", "HR", "HU", "IE", "IT", "LT", "LU", "LV", "NL", "NO",
-                        "PL", "PT", "RO", "SE", "SI", "SK"
-            };
+
+
             switch(input)
             { 
                 case 1: //if user selects 1, plot candlesticks for all countries
                 {
-                    std::cout << "Plotting candlesticks for all countries..." << std::endl;
                   
-                    std::map<std::string, std::vector<Candlestick>> allCandlesticks = CandleGenerator::computeCandlesticks(weatherDataEntries, countries);
-                    std::cout << "Candlesticks computed for all countries." << std::endl;
+                    
+
                     // // test to see if the candlesticks for GB are present and correct
                     // if (allCandlesticks.find("AT") != allCandlesticks.end()) {
                     //     std::cout << "\nCandlestick data for GB:\n";
@@ -85,7 +89,9 @@ int main()
                     std::string country;
                     std::cout << "Enter country code (e.g., AT, BE, etc.): ";
                     std::cin >> country;
-              
+                    auto countryCandles = CandleFilter::filterByCountry(allCandlesticks, country);
+                    Plot::plotCandlestick(countryCandles);
+                    std::cout << "Plotting candlesticks for country: " << country << std::endl;
                     break;
                 }
                 case 3: //if user selects 3, plot candlesticks for a specific year range
@@ -95,6 +101,13 @@ int main()
                     std::cin >> startYear;
                     std::cout << "Enter end year: ";
                     std::cin >> endYear;
+                    std::vector<Candlestick> combined;
+                    for (const auto& [country, candles] : allCandlesticks){
+                        auto filtered = CandleFilter::filterByYearRange(candles, startYear, endYear);
+                        combined.insert(combined.end(), filtered.begin(), filtered.end());
+                    }
+                    Plot::plotCandlestick(combined);
+                    std::cout << "Plotting candlesticks for the specified year range: " << startYear << " to " << endYear << std::endl;
                     // Call function to filter and plot data for the specified year range
                     break;
                 }
@@ -108,7 +121,9 @@ int main()
                     std::cin >> startYear;
                     std::cout << "Enter end year: ";
                     std::cin >> endYear;
-                    // Call function to filter and plot data for the specified country and year range
+                    auto countryCandles = CandleFilter::filterByCountry(allCandlesticks, country);
+                    auto filteredCandles = CandleFilter::filterByYearRange(countryCandles, startYear, endYear);
+                    Plot::plotCandlestick(filteredCandles);
                     break;
                 }
                 case 5: //if user selects 5, perform temperature trend analysis
