@@ -1,9 +1,11 @@
 //plot.cpp implementation
 // Will contain the plotting logic for the candlestick data
+//own code
 #include "Plot.h"
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 //function to plot the candlestick data, takes in a vector of candlestick objects.
 //and prints it to the console in a simple text-based format
@@ -33,7 +35,7 @@ void Plot::plotCandlestick(std::vector<Candlestick> candlesticks) {
         }
     }
 
-    // Adjust the y-axis range to create space for the header
+    // Adjust the y-axis, looks better with some padding
     y_max += 2;
     y_min -= 2; 
 
@@ -73,6 +75,8 @@ void Plot::plotCandlestick(std::vector<Candlestick> candlesticks) {
     std::cout << std::endl; //tidy abit here
     // Iterate through each candlestick and print its data
     // print out each candlestick data at the bottom of the plot
+    std::cout << "\nYear\tOpen\tHigh\tLow\tClose" << std::endl;
+    std::cout << "----------------------------------------" << std::endl;
     for (const auto& candle : candlesticks) {
 
         std::cout << candle.time_key << "\t"
@@ -82,3 +86,149 @@ void Plot::plotCandlestick(std::vector<Candlestick> candlesticks) {
                   << candle.close << std::endl;
     }
 }
+
+//function to plot the regression line, takes in a vector of Point objects 
+//Takes input params: vector of Point objects
+//Prints a simple text-based plot of the regression line
+//The x-axis represents the x value, and the y-axis represents the actual value
+//The symbol is used to differentiate between actual and predicted values
+//'x' for actual values and 'o' for predicted values
+void Plot::plotLine(std::vector<Point> points) {
+    //store the actual and predicted points in separate vectors
+    std::vector<Point> actualPoints;
+    std::vector<Point> predictedPoints;
+    for (const auto& point : points) {
+        if (point.symbol == 'x')
+            actualPoints.push_back(point);
+        else if (point.symbol == 'o')
+            predictedPoints.push_back(point);
+    }
+
+    std::sort(actualPoints.begin(), actualPoints.end(), [](const Point& a, const Point& b) {
+        return a.x < b.x;
+    });
+
+    // Take the latest 5 years from the end
+    std::vector<Point> filtered;
+    int actualCount = actualPoints.size();
+    for (int i = std::max(0, actualCount - 5); i < actualCount; ++i) {
+        filtered.push_back(actualPoints[i]);
+    }
+
+    // Add predicted points
+    filtered.insert(filtered.end(), predictedPoints.begin(), predictedPoints.end());
+
+    // Find the min and max values for x and y axes
+    int x_min = filtered[0].x;
+    int x_max = filtered[0].x;
+    float y_min = filtered[0].actual;
+    float y_max = filtered[0].actual;
+
+    for (const auto& point : filtered) {
+        if (point.actual > y_max) y_max = point.actual;
+        if (point.actual < y_min) y_min = point.actual;
+        if (point.x > x_max) x_max = point.x;
+        if (point.x < x_min) x_min = point.x;
+    }
+
+    // Calculate the range for plotting
+    float y_range = y_max - y_min;
+    int plot_height = 20; // Fixed height for the plot
+    
+    // Adjust bounds for better visualization
+    float y_plot_min = y_min - y_range * 0.1f; // Add 10% padding
+    float y_plot_max = y_max + y_range * 0.1f;
+    
+    // Print the plot from top to bottom
+    for (int row = plot_height; row >= 0; --row) {
+        // Calculate the actual temperature value for this row
+        float current_y = y_plot_min + (y_plot_max - y_plot_min) * row / plot_height;
+        
+        // Print the y-axis label only at specific intervals to avoid clutter
+        if (row % 3 == 0 || row == plot_height || row == 0) {
+            printf("%6.1f|", current_y);
+        } else {
+            printf("      |"); // Just print spaces and the vertical bar
+        }
+        
+        // For each x position, check if there's a point to plot
+        for (int year = x_min; year <= x_max; ++year) {
+            bool point_plotted = false;
+            
+            // Check if any point should be plotted at this position
+            for (const auto& point : filtered) {
+                if (point.x == year) {
+                    // Check if this point's y-value is close to the current row's y-value
+                    float tolerance = (y_plot_max - y_plot_min) / (2 * plot_height);
+                    if (std::abs(point.actual - current_y) <= tolerance) {
+                        printf("  %c  ", point.symbol);
+                        point_plotted = true;
+                        break;
+                    }
+                }
+            }
+            // If no point was plotted for this year, print spaces
+            if (!point_plotted) {
+                printf("     ");
+            }
+        }
+        printf("\n");
+    }
+
+    // Print the x-axis header at the bottom of the plot
+    printf("      ");
+    for (int i = x_min; i <= x_max; ++i)
+        std::cout << "-----";
+    std::cout << "\n      ";
+
+    // Print the year labels for each point
+    for (int i = x_min; i <= x_max; ++i)
+        printf(" %04d", i);
+    std::cout << std::endl;
+}
+
+//function to plot a table of data, takes in a vector of Point objects
+//Takes input params: vector of Point objects
+//Prints the x value, actual value and symbol for each point in the vector
+//The symbol is used to differentiate between actual and predicted values
+void Plot::plotTable(std::vector<Point> points) {
+    //store the actual and predicted points in separate vectors
+    std::vector<Point> actualPoints;
+    std::vector<Point> predictedPoints;
+
+    // Separate actual and predicted points
+    for (const auto& point : points) {
+        if (point.symbol == 'x') {
+            actualPoints.push_back(point);
+        } else if (point.symbol == 'o') {
+            predictedPoints.push_back(point);
+        }
+    }
+
+    // Sort actual points by descending temperature
+    std::sort(actualPoints.begin(), actualPoints.end(), [](const Point& a, const Point& b) {
+        return a.x > b.x;
+    });
+
+    std::cout << "\nLast 5 Years:\n";
+    std::cout << "Year | Temp   | Type\n";
+    std::cout << "--------------------------\n";
+    // Print the latest 5 years (highest years) from actualPoints
+    int n = actualPoints.size();
+    for (int i = 0; i < std::min(5, n); ++i) {
+        const auto& p = actualPoints[i];
+        printf("%4d | %.4f | (actual)\n", p.x, p.actual);
+    }
+
+    std::cout << "\nNext 12-Year Temperature Predictions:\n";
+    std::cout << "Year | Temp   | Type\n";
+    std::cout << "--------------------------\n";
+    // Print the next 12 years (lowest years) from predictedPoints
+    for (const auto& p : predictedPoints) {
+        printf("%4d | %.4f | (predicted)\n", p.x, p.actual);
+    }
+}
+//end of own code
+
+// Note: The above code assumes that the Candlestick and Point classes are defined as per the provided snippets.
+// Make sure to include the necessary headers and link against the required libraries when compiling this code.

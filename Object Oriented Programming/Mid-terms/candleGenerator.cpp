@@ -1,3 +1,4 @@
+//own code
 //Task 1:
 //this will create a candlestick and store them inside a vector candlestick object called candlesticks.
 //tasks include:
@@ -15,7 +16,8 @@
 
 //Function to compute a vector of candlesticks for a country from a vector of WeatherDataEntry objects.
 std::vector<Candlestick> CandleGenerator::computeCandlesticks(const std::vector<WeatherDataEntry>& entries, const std::string& country){
-
+    //Store the yearly data in a map, where the key is the year and the value is a vector of temperatures for that year
+    //This will allow us to group the data by year and compute the average, high, low, and open/close values for each year
     std::map<std::string, std::vector<double>> YearlyData;
 
     // Group data by year
@@ -113,8 +115,11 @@ std::map<std::string, std::vector<Candlestick>> CandleGenerator::computeCandlest
     const std::vector<WeatherDataEntry>& entries,
     const std::vector<std::string>& countries)
 {
+    // Create a map to store candlesticks for each country
+    // The key is the country code, and the value is a vector of Candlestick objects
+    // This will allow us to compute candlesticks for each country separately
     std::map<std::string, std::vector<Candlestick>> allCandlesticks;
-
+    //iterate through each country and compute the candlesticks
     for (const auto& country : countries) {
         allCandlesticks[country] = computeCandlesticks(entries, country);
     }
@@ -136,3 +141,7 @@ void CandleGenerator::generateCandles(const std::vector<Candlestick>& candlestic
                           << std::endl;
             }
 }
+//end of own code
+// This function is used to generate candlestick data from a vector of WeatherDataEntry objects.
+// It computes the average, high, low, and open/close values for each year based on the temperature data for the specified country.
+// The generated candlesticks are then stored in a vector of Candlestick objects.

@@ -1,7 +1,9 @@
 //plot.h implementation
+//own code
 #pragma once
 #include <vector>
 #include "Candlestick.h"
+#include "point.h"
 
 //this class handles all plotting related tasks 
 class Plot {
@@ -10,8 +12,11 @@ class Plot {
         //and prints it to the console in a simple text-based format
         static void plotCandlestick(std::vector<Candlestick> candlesticks);
 
-        //static void plotLine(std::vector<Point> data);
+        //function to plot the regression line, takes in a vector of Point objects
+        static void plotLine(std::vector<Point> data);
 
-        //static void plotTable(std::vector<Point> data);
+        //function to plot a table of data, takes in a vector of Point objects
+        static void plotTable(std::vector<Point> data);
         
-    };
+};
+//end of own code

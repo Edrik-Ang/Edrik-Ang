@@ -1,3 +1,8 @@
+//candlefilter.cpp implementation
+// This file contains the implementation of the CandleFilter class, which provides methods to filter candlestick data by country and year range.
+// It includes the necessary headers and uses the Candlestick class to represent individual candlestick data.
+// The filterByCountry method retrieves candlesticks for a specific country, while the filterByYearRange method filters candlesticks based on a specified year range.
+//own code
 #include "CandleFilter.h"
 #include <vector>
 #include <string>
@@ -31,3 +36,4 @@ std::vector<Candlestick> CandleFilter::filterByYearRange(const std::vector<Candl
     }
     return results;
 }
+//end of own code

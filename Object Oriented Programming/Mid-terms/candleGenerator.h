@@ -1,3 +1,4 @@
+//own code
 //candlegenerator.h implementation
 #pragma once
 #include "WeatherDataEntry.h"
@@ -24,3 +25,4 @@ class CandleGenerator {
         //output is prints out the candlestick values: year, open, close, high, low
         static void generateCandles(const std::vector<Candlestick>& candlesticks) ;
 };
+//end of own code

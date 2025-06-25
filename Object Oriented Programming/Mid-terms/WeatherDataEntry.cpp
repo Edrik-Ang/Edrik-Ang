@@ -1,3 +1,6 @@
+//own code
+//WeatherDataEntry.cpp implementation file
+// This file contains the implementation of the WeatherDataEntry class, which represents a single entry of weather data.
 #include "WeatherDataEntry.h"
 
 WeatherDataEntry::WeatherDataEntry(std::string _timestamp,  
@@ -58,3 +61,4 @@ WeatherDataEntry::WeatherDataEntry(std::string _timestamp,
     SE(_SE),
     SI(_SI),
     SK(_SK) {}
+    //end of own code

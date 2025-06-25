@@ -1,3 +1,8 @@
+//own code
+// CSV.cpp implementation file
+// This file contains the implementation of the CSV class, which provides methods to read and parse a CSV file containing weather data.
+// It includes the necessary headers and uses the WeatherDataEntry class to represent individual weather data entries.
+// The readLine method reads the CSV file line by line, tokenizes each line based on the separator (comma), and stores each WeatherDataEntry object in a vector for later use.
 //Implementation of the CSV.cpp class
 //task: 
 //1. Readthe CSV file line by line
@@ -59,6 +64,7 @@ std::vector<WeatherDataEntry> CSV::readLine(std::istream &filename) {
     return weatherDataEntries;
 }
 
+//end of own code
 //Referenced from Coursera Tokenise code
 std::vector<std::string> CSV::tokenise(const std::string& csvLine, char sep)
 {

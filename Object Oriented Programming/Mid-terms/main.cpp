@@ -1,3 +1,8 @@
+//Main.cpp implementation
+// This is the main entry point of the program, which reads weather data from a CSV file,
+// computes candlesticks for each country, and provides a menu for the user to interact with the data.
+// The user can plot candlesticks for all countries, filter by country or year range, and perform temperature trend analysis using linear regression.
+//own code
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -8,6 +13,7 @@
 #include "candleGenerator.h"
 #include "Plot.h"
 #include "candlefilter.h"
+#include "regression.h"
 
 
 
@@ -19,20 +25,27 @@ std::vector<std::string> countries = {
 
 int main()
 {
-
+    
     std::cout << "Reading weather data from CSV file... gonna take a while" << std::endl;
-
+    //read the weather data from the CSV file
     std::ifstream file("weather_data.csv");
     if (!file.is_open()) 
     {
+        //if the file cannot be opened, print an error message and exit
         std::cerr << "Error: Unable to open file." << std::endl;
         return 1;
     }
+    //Store the weather data entries in a vector of WeatherDataEntry objects
     std::vector<WeatherDataEntry> weatherDataEntries = CSV::readLine(file);
-
+    //Check if the entries were loaded successfully
     std::cout<< "Weather Data Entries Loaded: " << weatherDataEntries.size() << std::endl;
 
     std::cout << "computing all candlesticks, this may take a while..." << std::endl;
+    //Store the candlesticks for all countries in a map, where the key is the country code and the value is a vector of Candlestick objects
+    //The computeCandlesticks function takes in the weather data entries and the list of countries
+    //and returns a map of candlesticks for each country
+    //The Candlestick objects are computed from the WeatherDataEntry objects
+    //The Candlestick objects contain the time_key, open, close, high, and low values for each country
     std::map<std::string, std::vector<Candlestick>> allCandlesticks = CandleGenerator::computeCandlesticks(weatherDataEntries, countries);
     std::cout << "All candlesticks computed successfully." << std::endl;
     auto exit = false;
@@ -59,9 +72,6 @@ int main()
             { 
                 case 1: //if user selects 1, plot candlesticks for all countries
                 {
-                  
-                    
-
                     // // test to see if the candlesticks for GB are present and correct
                     // if (allCandlesticks.find("AT") != allCandlesticks.end()) {
                     //     std::cout << "\nCandlestick data for GB:\n";
@@ -107,8 +117,7 @@ int main()
                         combined.insert(combined.end(), filtered.begin(), filtered.end());
                     }
                     Plot::plotCandlestick(combined);
-                    std::cout << "Plotting candlesticks for the specified year range: " << startYear << " to " << endYear << std::endl;
-                    // Call function to filter and plot data for the specified year range
+                    std::cout << "Plotting candlesticks for all regions of the specified year range: " << startYear << " to " << endYear << std::endl;
                     break;
                 }
                 case 4: //if user selects 4, plot candlesticks for a specific country and year range
@@ -117,10 +126,21 @@ int main()
                     int startYear, endYear;
                     std::cout << "Enter country code (e.g., AT, BE, etc.): ";
                     std::cin >> country;
+                     // Check if the country code is valid
+                    if (allCandlesticks.find(country) == allCandlesticks.end()) {
+                        std::cerr << "Invalid country code. Please try again." << std::endl;
+                        continue; // Skip to the next iteration of the loop
+                    }
                     std::cout << "Enter start year: ";
                     std::cin >> startYear;
                     std::cout << "Enter end year: ";
                     std::cin >> endYear;
+                    // Validate the year range
+                    if (startYear > endYear) {
+                        std::cerr << "Invalid year range. Start year must be less than or equal to end year." << std::endl;
+                        continue; // Skip to the next iteration of the loop
+                    }
+                   
                     auto countryCandles = CandleFilter::filterByCountry(allCandlesticks, country);
                     auto filteredCandles = CandleFilter::filterByYearRange(countryCandles, startYear, endYear);
                     Plot::plotCandlestick(filteredCandles);
@@ -128,11 +148,22 @@ int main()
                 }
                 case 5: //if user selects 5, perform temperature trend analysis
                 {
-                    int startYear, endYear;
-                    std::cout << "Enter start year: ";
-                    std::cin >> startYear;
-                    std::cout << "Enter end year: ";
-                    std::cin >> endYear;
+                    std::string country;
+                    std::cout << "Enter country code (e.g., AT, BE, etc.): ";
+                    std::cin >> country;
+                    std::cout <<"Fitting data for country: " << country << std::endl;
+                    auto countryCandles = CandleFilter::filterByCountry(allCandlesticks, country);
+                    std::cout<<"Calculating regression for country: " << country << std::endl;
+                    auto regressionData = regression::calculateRegression(countryCandles, country);
+                    std::cout << "Plotting regression data for country: " << country << std::endl;
+                    Plot::plotLine(regressionData);
+                    std::cout << "Legend: " <<std::endl;
+                
+                    std::cout<< "\tx - actual" << std::endl;
+                    std::cout<< "\to - predicted" << std::endl;
+                    std::cout<< std::endl;
+                    Plot::plotTable(regressionData);
+                    std::cout << "Temperature trend analysis completed for country: " << country << std::endl;
                     break;
                 }
                 case 6:
@@ -142,11 +173,10 @@ int main()
                 }
                 default:
                 {
-                    std::cout << "Invalid option. Please try again." << std::endl;
+                    std::cout << "Invalid option. Enter 1-6" << std::endl;
                     break;
                 }
-            }
-            
+            }            
         }
         catch (const std::exception& e) 
         {
@@ -157,6 +187,6 @@ int main()
     std::cout<< "Exiting program..." << std::endl;
     file.close();
     std::cout << "File closed successfully." << std::endl;
-
     return 0;
 }
+//end of own code

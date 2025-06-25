@@ -1,6 +1,6 @@
+//own code
 #pragma once
 #include <string>
-
 
 //**WeatherDataEntry class is to encapsulate the data of each line read to be later organised. */
 //Takes the timestamp and the weather data for each country as parameters.
@@ -67,7 +67,5 @@ class WeatherDataEntry {
         double SE;
         double SI;
         double SK;
-            
-
-
 };
+//end of own code

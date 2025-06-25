@@ -1,5 +1,6 @@
 //candlefilter.h implementation
 //will handle all the filtering logic of the candlesticks based on user input, e.g press 2, then choose country then filter only country
+//Own code 
 #pragma once
 #include "Candlestick.h"
 #include <vector>
@@ -15,3 +16,4 @@ class CandleFilter {
         static std::vector<Candlestick> filterByYearRange(const std::vector<Candlestick>& candles, int startYear, int endYear);
 
 };
+//end of own code
