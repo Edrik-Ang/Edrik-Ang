@@ -11,14 +11,12 @@
 //and prints it to the console in a simple text-based format
 //Does not takes in the country code, as the candlestick data is already filtered by country
 void Plot::plotCandlestick(std::vector<Candlestick> candlesticks) {
-    
     //need to find the max and min values for the y-axis and x-axis to find the range of the plot
     //set the initial values to the first candlestick's values
     int y_max = candlesticks[0].high;
     int y_min = candlesticks[0].low;
     int x_max = candlesticks[0].time_key;
     int x_min = candlesticks[0].time_key;
-
     //Iterate through the candlesticks to find the highest and lowest values for y-axis and x-axis
     for (auto candlestick: candlesticks){
         if (candlestick.high > y_max) {
@@ -34,13 +32,13 @@ void Plot::plotCandlestick(std::vector<Candlestick> candlesticks) {
             x_min = candlestick.time_key;
         }
     }
-
     // Adjust the y-axis, looks better with some padding
     y_max += 2;
     y_min -= 2; 
-
+    //PlotCandlestick function takes reference from https://simgejl.notion.site/Midterm-Essential-Logics-to-Generate-Text-based-Plots-d03a45ee1d10404986623dc3190b9ee6
+    //Code is modified to suit the candlestick data structure
     // Print the header for the plot
-    for (auto i = y_max; i>= y_min; --i){
+    for (auto i = y_max; i>= y_min; --i){ //check each y value from y_max to y_min
         printf("%03d|", i);
         for (auto candlestick : candlesticks) //go through each candlestick
         {   // draws the vertical points row by row
@@ -58,16 +56,13 @@ void Plot::plotCandlestick(std::vector<Candlestick> candlesticks) {
         }
         printf("\n");
     }
-
     //This next step prints the x-axis header
     //it prints a line of --- for each x-axis value
     for(auto i = x_min; i <= x_max; ++i) {
         std::cout << "-----";
     }
-
     std::cout << std::endl;
     std::cout << "   ";
-
     //prints the year labels for each candlestick
     for (auto i = x_min; i <= x_max; i++){
         printf(" %04d", i);
@@ -78,7 +73,6 @@ void Plot::plotCandlestick(std::vector<Candlestick> candlesticks) {
     std::cout << "\nYear\tOpen\tHigh\tLow\tClose" << std::endl;
     std::cout << "----------------------------------------" << std::endl;
     for (const auto& candle : candlesticks) {
-
         std::cout << candle.time_key << "\t"
                   << candle.open << "\t"
                   << candle.high << "\t"
@@ -93,6 +87,7 @@ void Plot::plotCandlestick(std::vector<Candlestick> candlesticks) {
 //The x-axis represents the x value, and the y-axis represents the actual value
 //The symbol is used to differentiate between actual and predicted values
 //'x' for actual values and 'o' for predicted values
+////Purpose is to plot the points of the regression line
 void Plot::plotLine(std::vector<Point> points) {
     //store the actual and predicted points in separate vectors
     std::vector<Point> actualPoints;
@@ -123,42 +118,36 @@ void Plot::plotLine(std::vector<Point> points) {
     int x_max = filtered[0].x;
     float y_min = filtered[0].actual;
     float y_max = filtered[0].actual;
-
+    // Iterate through the filtered points to find the min and max values
+    // for both x and y axes
     for (const auto& point : filtered) {
         if (point.actual > y_max) y_max = point.actual;
         if (point.actual < y_min) y_min = point.actual;
         if (point.x > x_max) x_max = point.x;
         if (point.x < x_min) x_min = point.x;
     }
-
     // Calculate the range for plotting
     float y_range = y_max - y_min;
-    int plot_height = 20; // Fixed height for the plot
-    
-    // Adjust bounds for better visualization
-    float y_plot_min = y_min - y_range * 0.1f; // Add 10% padding
+    int plot_height = 20; 
+    float y_plot_min = y_min - y_range * 0.1f; // Looks better with some padding
     float y_plot_max = y_max + y_range * 0.1f;
-    
     // Print the plot from top to bottom
     for (int row = plot_height; row >= 0; --row) {
         // Calculate the actual temperature value for this row
         float current_y = y_plot_min + (y_plot_max - y_plot_min) * row / plot_height;
-        
-        // Print the y-axis label only at specific intervals to avoid clutter
-        if (row % 3 == 0 || row == plot_height || row == 0) {
+        // print y-axis label at intervals of 5, 0 and plot_height
+        if (row % 5 == 0 || row == plot_height || row == 0) {
             printf("%6.1f|", current_y);
         } else {
-            printf("      |"); // Just print spaces and the vertical bar
+            printf("      |"); 
         }
-        
-        // For each x position, check if there's a point to plot
+        // For every year, check if a pt needs to be plotted
         for (int year = x_min; year <= x_max; ++year) {
             bool point_plotted = false;
-            
             // Check if any point should be plotted at this position
             for (const auto& point : filtered) {
                 if (point.x == year) {
-                    // Check if this point's y-value is close to the current row's y-value
+                    // imrpove the tolerance check to allow for slight variations in y values
                     float tolerance = (y_plot_max - y_plot_min) / (2 * plot_height);
                     if (std::abs(point.actual - current_y) <= tolerance) {
                         printf("  %c  ", point.symbol);
@@ -167,7 +156,7 @@ void Plot::plotLine(std::vector<Point> points) {
                     }
                 }
             }
-            // If no point was plotted for this year, print spaces
+            // print space if no pt was plotted here.
             if (!point_plotted) {
                 printf("     ");
             }
@@ -189,7 +178,8 @@ void Plot::plotLine(std::vector<Point> points) {
 
 //function to plot a table of data, takes in a vector of Point objects
 //Takes input params: vector of Point objects
-//Prints the x value, actual value and symbol for each point in the vector
+//Prints the x value, actual value and symbol for each point in the vector at bottom of the plot
+//Purpose is to provide a summary of the actual and predicted values in a tabular format
 //The symbol is used to differentiate between actual and predicted values
 void Plot::plotTable(std::vector<Point> points) {
     //store the actual and predicted points in separate vectors
@@ -217,15 +207,16 @@ void Plot::plotTable(std::vector<Point> points) {
     int n = actualPoints.size();
     for (int i = 0; i < std::min(5, n); ++i) {
         const auto& p = actualPoints[i];
-        printf("%4d | %.4f | (actual)\n", p.x, p.actual);
+        printf("%4d | %.4f | (actual)\n", p.x, p.actual); 
     }
 
+    // Sort predicted points by ascending temperature
     std::cout << "\nNext 12-Year Temperature Predictions:\n";
     std::cout << "Year | Temp   | Type\n";
     std::cout << "--------------------------\n";
     // Print the next 12 years (lowest years) from predictedPoints
     for (const auto& p : predictedPoints) {
-        printf("%4d | %.4f | (predicted)\n", p.x, p.actual);
+        printf("%4d | %.4f | (predicted)\n", p.x, p.actual); 
     }
 }
 //end of own code

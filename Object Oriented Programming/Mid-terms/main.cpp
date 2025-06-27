@@ -28,7 +28,7 @@ int main()
     
     std::cout << "Reading weather data from CSV file... gonna take a while" << std::endl;
     //read the weather data from the CSV file
-    std::ifstream file("weather_data.csv");
+    std::ifstream file("weather_data_EU_1980-2019_temp_only.csv");
     if (!file.is_open()) 
     {
         //if the file cannot be opened, print an error message and exit

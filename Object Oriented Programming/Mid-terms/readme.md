@@ -1,6 +1,6 @@
 ## How to Run the Project
 
-1. Make sure the `weather_data.csv` file is in the same folder as all the `.cpp` and header files.
+1. Make sure the `weather_data_EU_1980-2019_temp_only.csv` file is in the main.cpp file.
 2. Open a terminal in that folder.
 3. Compile the project using the following command:
     ```sh

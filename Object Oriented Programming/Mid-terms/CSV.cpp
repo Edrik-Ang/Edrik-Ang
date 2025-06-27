@@ -66,6 +66,8 @@ std::vector<WeatherDataEntry> CSV::readLine(std::istream &filename) {
 
 //end of own code
 //Referenced from Coursera Tokenise code
+//Used with no modifications
+//
 std::vector<std::string> CSV::tokenise(const std::string& csvLine, char sep)
 {
    std::vector<std::string> tokens;

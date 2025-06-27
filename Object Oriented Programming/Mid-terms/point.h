@@ -13,7 +13,8 @@ class Point {
 
         char symbol; //symbol to represent point on plot (e.g 'x" or 'o')
 
-    Point(int _x, float _actual, char _symbol): x(_x), actual(_actual), symbol(_symbol) 
+    Point(int _x, float _actual, char _symbol):
+          x(_x), actual(_actual), symbol(_symbol) 
     {}
 };
 //end of own code
